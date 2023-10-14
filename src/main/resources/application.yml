@@ -1,0 +1,15 @@
+server:
+  port: 7015
+
+spring:
+
+  profiles:
+    active: dev
+
+  springdoc:
+    swagger-ui.path: /swagger-ui.html
+    show-actuator: true
+
+casbin:
+  model: classpath:casbin/model.conf
+  policy: classpath:casbin/policy.csv

@@ -1,0 +1,14 @@
+# permissions for xxx (by default)
+p, role:xxx:read, feature:xxx, READ
+p, role:xxx:write, feature:xxx, WRITE
+p, role:xxx:delete, feature:xxx, DELETE
+
+# roles for xxx (by default)
+g, role:xxx:admin, role:xxx:read
+g, role:xxx:admin, role:xxx:write
+g, role:xxx:admin, role:xxx:delete
+
+g, role:xxx:editor, role:xxx:read
+g, role:xxx:editor, role:xxx:write
+
+g, role:xxx:viewer, role:xxx:read

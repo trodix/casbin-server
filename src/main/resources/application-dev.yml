@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5435/casbin
+    username: postgres
+    password: postgres
+
+  ## Keycloak SSO Authentication Server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/market
+      client:
+        provider:
+          market:
+            token-uri: http://localhost:8080/realms/market/protocol/openid-connect/token
+        registration:
+          market:
+            authorization-grant-type: client_credentials
+            client-id: duckcloud-webservice
+            client-secret: mqZqOOLh9pUEXNclDI7k9Lz1AymXptWE
+
+app:
+  auth:
+    allowed-origins: http://localhost:4200
