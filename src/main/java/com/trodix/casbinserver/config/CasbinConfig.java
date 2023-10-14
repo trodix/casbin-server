@@ -54,7 +54,6 @@ public class CasbinConfig {
 
         CasbinFilePolicyLoader.ConfigRules configRules = loader.parseRules(casbinPolicyConfig);
         loader.persistLocalPolicy(configRules, enforcer);
-
     }
 
 }
