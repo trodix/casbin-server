@@ -1,4 +1,4 @@
-package com.trodix.casbinserver.api.controllers;
+package com.trodix.casbinserver.api;
 
 import lombok.RequiredArgsConstructor;
 import org.casbin.jcasbin.main.Enforcer;
@@ -10,7 +10,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/authorization")
 @RequiredArgsConstructor
-public class AuthorizationController {
+public class Authorization {
 
     private final Enforcer enforcer;
 
