@@ -20,8 +20,8 @@
 	<description>A centralized casbin instance providing REST endpoints</description>
 
 	<modules>
-<!--		<module>casbin-rest-java-client</module>-->
 		<module>casbin-server-api</module>
+		<module>casbin-rest-java-client</module>
 	</modules>
 
 	<properties>

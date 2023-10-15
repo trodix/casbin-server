@@ -1,14 +1,14 @@
-# permissions for xxx (by default)
-p, role:xxx:read, feature:xxx, READ
-p, role:xxx:write, feature:xxx, WRITE
-p, role:xxx:delete, feature:xxx, DELETE
+# permissions for node (by default)
+p, role:node:read, feature:node, READ
+p, role:node:write, feature:node, WRITE
+p, role:node:delete, feature:node, DELETE
 
-# roles for xxx (by default)
-g, role:xxx:admin, role:xxx:read
-g, role:xxx:admin, role:xxx:write
-g, role:xxx:admin, role:xxx:delete
+# roles for node (by default)
+g, role:node:admin, role:node:read
+g, role:node:admin, role:node:write
+g, role:node:admin, role:node:delete
 
-g, role:xxx:editor, role:xxx:read
-g, role:xxx:editor, role:xxx:write
+g, role:node:editor, role:node:read
+g, role:node:editor, role:node:write
 
-g, role:xxx:viewer, role:xxx:read
+g, role:node:viewer, role:node:read

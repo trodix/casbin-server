@@ -14,9 +14,6 @@
     <name>casbin-server-api</name>
 
     <properties>
-        <openapi-spec-dir>${project.parent.build.directory}</openapi-spec-dir>
-        <openapi-spec-filename>openapi.json</openapi-spec-filename>
-
         <springdoc.version>2.2.0</springdoc.version>
         <apache-commons-collection.version>4.4</apache-commons-collection.version>
         <casbin.version>1.2.0</casbin.version>
@@ -101,82 +98,6 @@
                         </exclude>
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>pre-integration-test</id>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>post-integration-test</id>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <apiDocsUrl>http://localhost:7015/v3/api-docs</apiDocsUrl>
-                    <outputDir>${openapi-spec-dir}</outputDir>
-                    <outputFileName>${openapi-spec-filename}</outputFileName>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-casbin-rest-java-client</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>post-integration-test</phase>
-                        <configuration>
-                            <workingDirectory>${project.parent.basedir}/casbin-rest-java-client</workingDirectory>
-                            <executable>mvn</executable>
-                            <arguments>
-                                <argument>clean</argument>
-                                <argument>package</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-artifacts</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>${project.parent.basedir}/casbin-rest-java-client/target/casbin-rest-java-client-${version}.jar</file>-->
-                                    <classifier>sdk</classifier>
-                                    <type>jar</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

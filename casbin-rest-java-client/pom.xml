@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>com.trodix</groupId>
         <artifactId>casbin-server</artifactId>
@@ -14,70 +13,26 @@
     <name>casbin-rest-java-client</name>
 
     <properties>
-        <openapi-spec-dir>${project.parent.build.directory}</openapi-spec-dir>
-        <openapi-spec-filename>openapi.json</openapi-spec-filename>
-        <openapi.source.directory>${project.build.directory}/generated-sources/openapi</openapi.source.directory>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.10.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-        <!-- CodeGen -->
         <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.2.6</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
-        <!-- /CodeGen -->
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>6.6.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${openapi-spec-dir}/${openapi-spec-filename}</inputSpec>
-                            <generatorName>java</generatorName>
-                            <library>native</library>
-                            <output>${openapi.source.directory}</output>
-                            <groupId>${groupId}</groupId>
-                            <artifactId>${artifactId}</artifactId>
-                            <packageName>${name}</packageName>
-                            <apiPackage>com.trodix.casbinserver.client.api</apiPackage>
-                            <modelPackage>com.trodix.casbinserver.client.model</modelPackage>
-                            <invokerPackage>com.trodix.casbinserver.client.invoker</invokerPackage>
-
-                            <configOptions>
-                                <useJakartaEe>true</useJakartaEe>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <!-- Add the generated source to the project so it gets compiled -->
-                                <source>${openapi.source.directory}/src/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>
