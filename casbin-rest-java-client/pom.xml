@@ -22,33 +22,9 @@
     <dependencies>
         <!-- CodeGen -->
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.11.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>logging-interceptor</artifactId>
-            <version>4.11.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.gsonfire</groupId>
-            <artifactId>gson-fire</artifactId>
-            <version>1.8.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-            <version>2.1.1</version>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
         </dependency>
         <!-- /CodeGen -->
     </dependencies>
@@ -67,7 +43,7 @@
                         <configuration>
                             <inputSpec>${openapi-spec-dir}/${openapi-spec-filename}</inputSpec>
                             <generatorName>java</generatorName>
-                            <library>okhttp-gson</library>
+                            <library>native</library>
                             <output>${openapi.source.directory}</output>
                             <groupId>${groupId}</groupId>
                             <artifactId>${artifactId}</artifactId>
@@ -75,6 +51,7 @@
                             <apiPackage>com.trodix.casbinserver.client.api</apiPackage>
                             <modelPackage>com.trodix.casbinserver.client.model</modelPackage>
                             <invokerPackage>com.trodix.casbinserver.client.invoker</invokerPackage>
+
                             <configOptions>
                                 <useJakartaEe>true</useJakartaEe>
                             </configOptions>
