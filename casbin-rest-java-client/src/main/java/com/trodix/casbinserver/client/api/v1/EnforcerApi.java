@@ -3,10 +3,12 @@ package com.trodix.casbinserver.client.api.v1;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.trodix.casbinserver.client.EnforcerClient;
 import com.trodix.casbinserver.client.exceptions.ApiException;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,34 +21,32 @@ public class EnforcerApi {
         this.client = client;
     }
 
+    private <T> T handleResponse(Response response) throws IOException {
+        if (response.isSuccessful()) {
+            String bodyResponse = response.body().string();
+            return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
+            });
+        }
+
+        throw new ApiException(String.format("\nresponse code: %s\nresponse body: \n%s",
+                response.code(), response.body().string()));
+    }
+
     public boolean enforce(String... rvals) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("rvals", rvals))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/enforce"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "rvals", rvals
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/enforce")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -55,32 +55,19 @@ public class EnforcerApi {
 
     public boolean removePolicy(String... params) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("params", params))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/remove-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "params", params
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/remove-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -89,33 +76,19 @@ public class EnforcerApi {
 
     public boolean removeFilteredPolicy(int fieldIndex, String... fieldValues) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("fieldIndex", fieldIndex, "fieldValues", fieldValues))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/remove-filtered-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "fieldIndex", fieldIndex,
-                                            "fieldValues", fieldValues
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/remove-filtered-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -124,33 +97,22 @@ public class EnforcerApi {
 
     public boolean removeFilteredGroupingPolicy(int fieldIndex, String... fieldValues) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of(
+                                    "fieldIndex", fieldIndex,
+                                    "fieldValues", fieldValues
+                            ))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/remove-filtered-grouping-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "fieldIndex", fieldIndex,
-                                            "fieldValues", fieldValues
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/remove-filtered-grouping-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -159,32 +121,19 @@ public class EnforcerApi {
 
     public boolean addPolicy(String... params) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("params", params))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/add-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "params", params
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/add-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -193,32 +142,19 @@ public class EnforcerApi {
 
     public boolean hasPolicy(String... params) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("params", params))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/has-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "params", params
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/has-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -227,32 +163,19 @@ public class EnforcerApi {
 
     public boolean hasGroupingPolicy(String... params) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("params", params))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/has-grouping-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "params", params
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/has-grouping-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -261,33 +184,19 @@ public class EnforcerApi {
 
     public boolean addNamedPolicy(String ptype, String... params) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("ptype", ptype, "params", params))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/add-named-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "ptype", ptype,
-                                            "params", params
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/add-named-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -296,33 +205,19 @@ public class EnforcerApi {
 
     public boolean addNamedGroupingPolicy(String ptype, String... params) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("ptype", ptype, "params", params))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/add-named-grouping-policy"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "ptype", ptype,
-                                            "params", params
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/add-named-grouping-policy")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -331,26 +226,13 @@ public class EnforcerApi {
 
     public List<String> getAllActions() throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
-
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/get-all-actions"))
-                    .GET()
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-all-actions")
+                    .get()
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -359,26 +241,13 @@ public class EnforcerApi {
 
     public List<String> getAllObjects() throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
-
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/get-all-objects"))
-                    .GET()
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-all-objects")
+                    .get()
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -387,26 +256,13 @@ public class EnforcerApi {
 
     public List<String> getAllRoles() throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
-
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/get-all-roles"))
-                    .GET()
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-all-roles")
+                    .get()
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -415,26 +271,13 @@ public class EnforcerApi {
 
     public List<String> getAllSubjects() throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
-
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/get-all-subjects"))
-                    .GET()
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-all-subjects")
+                    .get()
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -443,33 +286,19 @@ public class EnforcerApi {
 
     public List<List<String>> getImplicitPermissionsForUser(String user, String... domain) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("user", user, "domain", domain))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/get-implicit-permissions-for-user"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "user", user,
-                                            "domain", domain
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-implicit-permissions-for-user")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -478,32 +307,19 @@ public class EnforcerApi {
 
     public List<String> getRolesForUser(String name) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("name", name))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/get-roles-for-user"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "name", name
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-roles-for-user")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
 
         } catch (Exception e) {
             throw new ApiException(e);
@@ -512,33 +328,19 @@ public class EnforcerApi {
 
     public Set<String> getPermittedActions(String subject, String object) throws ApiException {
         try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-            for (Map.Entry<String, String> header : client.getHeaders().entrySet()) {
-                builder.header(header.getKey(), header.getValue());
-            }
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("subject", subject, "object", object))
+                            .getBytes()
+            );
 
-            HttpRequest httpRequest = builder.uri(new URI(client.getBaseUrl() + "/api/v1/authorization/get-permitted-actions"))
-                    .POST(HttpRequest.BodyPublishers.ofString(
-                            client.getObjectMapper().writeValueAsString(
-                                    Map.of(
-                                            "subject", subject,
-                                            "object", object
-                                    )
-                            )
-                    ))
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-permitted-actions")
+                    .post(requestBody)
                     .build();
 
-            HttpResponse<String> response = client.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() / 100 == 2) {
-                String bodyResponse = response.body();
-                return client.getObjectMapper().readValue(bodyResponse, new TypeReference<>() {
-                });
-            }
-
-            throw new ApiException(String.format("response code: %s\nresponse body: \n%s",
-                    response.statusCode(), client.getObjectMapper().readValue(response.body(), String.class)));
+            return new HashSet<>(handleResponse(client.getHttpClient().newCall(httpRequest).execute()));
 
         } catch (Exception e) {
             throw new ApiException(e);

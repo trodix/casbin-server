@@ -1,30 +1,45 @@
 package com.trodix.casbinserver.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.net.http.HttpClient;
-import java.util.HashMap;
-import java.util.Map;
+import com.trodix.casbinserver.client.oauth2.AccessTokenInterceptor;
+import com.trodix.casbinserver.client.oauth2.OAuth2Service;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EnforcerClient {
 
-    private HttpClient httpClient;
-    private ObjectMapper objectMapper;
+    private static final Logger log = LoggerFactory.getLogger(EnforcerClient.class);
 
+    private OkHttpClient httpClient;
+    private Request.Builder requestBuilder;
+    private ObjectMapper objectMapper;
     private String baseUrl;
-    private Map<String, String> headers;
+    private OAuth2Service oauth2Service;
 
     public EnforcerClient() {
-        this.httpClient = HttpClient.newBuilder().build();
+        this.requestBuilder = new Request.Builder()
+                .header("Content-Type", "application/json");
+
         this.objectMapper = new ObjectMapper();
     }
 
-    public HttpClient getHttpClient() {
+    public OkHttpClient getHttpClient() {
         return httpClient;
     }
 
-    public void setClient(HttpClient client) {
-        this.httpClient = client;
+    public void setHttpClient(OkHttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    public Request.Builder getRequestBuilder() {
+        return requestBuilder;
+    }
+
+    public void setRequestBuilder(Request.Builder requestBuilder) {
+        this.requestBuilder = requestBuilder;
     }
 
     public ObjectMapper getObjectMapper() {
@@ -43,12 +58,12 @@ public class EnforcerClient {
         this.baseUrl = baseUrl;
     }
 
-    public Map<String, String> getHeaders() {
-        return headers;
+    public OAuth2Service getOauth2Service() {
+        return oauth2Service;
     }
 
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
+    public void setOauth2Service(OAuth2Service oauth2Service) {
+        this.oauth2Service = oauth2Service;
     }
 
     public EnforcerClientBuilder newBuilder() {
@@ -57,29 +72,59 @@ public class EnforcerClient {
 
     public class EnforcerClientBuilder {
 
-        private String _baseUrl;
-        private Map<String, String> _headers = new HashMap<>();
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
 
         public EnforcerClientBuilder() {
-            _headers.put("Content-Type", "application/json");
+
         }
 
-        public EnforcerClientBuilder baseUrl(String baseUrl) {
-            _baseUrl = baseUrl;
+        public EnforcerClientBuilder baseUrl(String _baseUrl) {
+            baseUrl = _baseUrl;
             return this;
         }
 
         public EnforcerClientBuilder header(String name, String value) {
-            _headers.put(name, value);
+            requestBuilder = requestBuilder.header(name, value);
+            return this;
+        }
+
+        public EnforcerClientBuilder oauth2(OAuth2Service _oauth2Service) {
+            oauth2Service = _oauth2Service;
             return this;
         }
 
         public EnforcerClient build() {
             EnforcerClient client = new EnforcerClient();
-            client.setBaseUrl(_baseUrl);
-            client.setHeaders(_headers);
+            client.setBaseUrl(baseUrl);
+            client.setRequestBuilder(requestBuilder);
+
+            httpClientBuilder.addInterceptor(new AccessTokenInterceptor(oauth2Service));
+            configureLoggingInterceptor();
+
+            client.setHttpClient(httpClientBuilder.build());
 
             return client;
+        }
+
+        private void configureLoggingInterceptor() {
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor((msg) -> {
+                if (log.isTraceEnabled()) {
+                    log.trace(msg);
+                } else if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
+            });
+
+            loggingInterceptor.redactHeader("Authorization");
+            loggingInterceptor.redactHeader("Cookie");
+
+            if (log.isTraceEnabled()) {
+                loggingInterceptor.level(HttpLoggingInterceptor.Level.BODY);
+            } else if (log.isDebugEnabled()) {
+                loggingInterceptor.level(HttpLoggingInterceptor.Level.BASIC);
+            }
+
+            httpClientBuilder.addInterceptor(loggingInterceptor);
         }
 
     }
