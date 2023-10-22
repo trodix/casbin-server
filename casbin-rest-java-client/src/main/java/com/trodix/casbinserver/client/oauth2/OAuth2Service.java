@@ -60,6 +60,6 @@ public class OAuth2Service {
     protected boolean isAccessTokenExpired() {
         DecodedJWT jwt = JWT.decode(tokenRepository.getAccessToken());
         Instant expiredDate = jwt.getExpiresAtAsInstant();
-        return !expiredDate.isBefore(Instant.now());
+        return expiredDate.isBefore(Instant.now());
     }
 }
