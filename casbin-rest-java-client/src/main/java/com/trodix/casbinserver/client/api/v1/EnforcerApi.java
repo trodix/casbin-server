@@ -326,6 +326,27 @@ public class EnforcerApi {
         }
     }
 
+    public boolean addRoleForUser(String user, String role) throws ApiException {
+        try {
+
+            RequestBody requestBody = RequestBody.create(
+                    client.getObjectMapper()
+                            .writeValueAsString(Map.of("user", user, "role", role))
+                            .getBytes()
+            );
+
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/add-role-for-user")
+                    .post(requestBody)
+                    .build();
+
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
+
+        } catch (Exception e) {
+            throw new ApiException(e);
+        }
+    }
+
     public Set<String> getPermittedActions(String subject, String object) throws ApiException {
         try {
 

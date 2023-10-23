@@ -3,6 +3,8 @@ package com.trodix.casbinserver.api.v1;
 import com.trodix.casbinserver.api.v1.requests.*;
 import lombok.RequiredArgsConstructor;
 import org.casbin.jcasbin.main.Enforcer;
+import org.casbin.jcasbin.rbac.DefaultRoleManager;
+import org.casbin.jcasbin.rbac.RoleManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -88,6 +90,11 @@ public class AuthorizationApi {
     @PostMapping("get-roles-for-user")
     public List<String> getRolesForUser(@RequestBody GetRolesForUserRequest request) {
         return enforcer.getRolesForUser(request.name());
+    }
+
+    @PostMapping("add-role-for-user")
+    public boolean addRoleForUser(@RequestBody AddRoleForUserRequest request) {
+        return enforcer.addRoleForUser(request.user(), request.role());
     }
 
     @PostMapping("get-permitted-actions")
