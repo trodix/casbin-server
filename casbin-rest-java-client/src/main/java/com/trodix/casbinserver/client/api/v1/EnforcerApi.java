@@ -368,4 +368,19 @@ public class EnforcerApi {
         }
     }
 
+    public List<List<String>> getGroupingPolicy() {
+        try {
+
+            Request httpRequest = client.getRequestBuilder()
+                    .url(client.getBaseUrl() + "/api/v1/authorization/get-grouping-policy")
+                    .get()
+                    .build();
+
+            return handleResponse(client.getHttpClient().newCall(httpRequest).execute());
+
+        } catch (Exception e) {
+            throw new ApiException(e);
+        }
+    }
+
 }

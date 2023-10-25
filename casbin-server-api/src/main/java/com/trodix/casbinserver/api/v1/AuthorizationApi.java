@@ -3,8 +3,6 @@ package com.trodix.casbinserver.api.v1;
 import com.trodix.casbinserver.api.v1.requests.*;
 import lombok.RequiredArgsConstructor;
 import org.casbin.jcasbin.main.Enforcer;
-import org.casbin.jcasbin.rbac.DefaultRoleManager;
-import org.casbin.jcasbin.rbac.RoleManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -100,6 +98,11 @@ public class AuthorizationApi {
     @PostMapping("get-permitted-actions")
     public Set<String> getPermittedActions(@RequestBody GetPermittedActionsRequest request) {
         return enforcer.getPermittedActions(request.subject(), request.object());
+    }
+
+    @GetMapping("get-grouping-policy")
+    public List<List<String>> getGroupingPolicy() {
+        return enforcer.getGroupingPolicy();
     }
 
 }
