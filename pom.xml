@@ -19,6 +19,14 @@
 	<name>casbin-server</name>
 	<description>A centralized casbin instance providing REST endpoints</description>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub trodix Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/trodix/casbin-server</url>
+		</repository>
+	</distributionManagement>
+
 	<modules>
 		<module>casbin-server-api</module>
 		<module>casbin-rest-java-client</module>
